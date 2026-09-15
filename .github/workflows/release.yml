@@ -1,0 +1,74 @@
+name: Build & Release (JF 12)
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+.[0-9]+-jf12'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. 3.0.0.0)'
+        required: true
+        default: '3.0.0.0'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v12
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Set version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            VERSION="${{ github.ref_name }}"
+            VERSION="${VERSION%-jf12}"
+          else
+            VERSION="${{ inputs.version }}"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        run: |
+          dotnet publish src/Jellyfin.Plugin.MediaBar/Jellyfin.Plugin.MediaBar.csproj \
+            -c Release \
+            -p:JellyfinVersion=12.0.0 \
+            -p:Version=${{ steps.version.outputs.version }} \
+            -o publish
+
+      - name: Package
+        run: |
+          cd publish
+          zip ../Release-12.0.0.zip Jellyfin.Plugin.MediaBar.dll logo.png
+          cd ..
+          md5sum Release-12.0.0.zip | awk '{print $1}' > Release-12.0.0.zip.md5
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.version }}-jf12
+          name: "${{ steps.version.outputs.version }} (Jellyfin 12)"
+          body: |
+            Media Bar ${{ steps.version.outputs.version }} built for Jellyfin 12.0.0.
+
+            Built from the `v12` branch of this fork, tracking upstream [IAmParadox27/jellyfin-plugin-media-bar@v12](https://github.com/IAmParadox27/jellyfin-plugin-media-bar/tree/v12).
+
+            **Install manually:**
+            1. Download `Release-12.0.0.zip`
+            2. Extract into your Jellyfin `plugins/MediaBar/` directory
+            3. Restart Jellyfin
+          files: |
+            Release-12.0.0.zip
+            Release-12.0.0.zip.md5
+          draft: false
+          prerelease: true
