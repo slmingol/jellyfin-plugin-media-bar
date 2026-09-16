@@ -1,0 +1,21 @@
+[
+    {
+        "guid": "08f615ea-2107-4f04-89cc-091035f54448",
+        "name": "Media Bar",
+        "overview": null,
+        "description": "Adds a media bar element at the top of the homepage on Jellyfin web",
+        "owner": "slmingol (fork of IAmParadox27)",
+        "category": "General",
+        "imageUrl": "https://raw.githubusercontent.com/slmingol/jellyfin-plugin-media-bar/v12/src/logo.png",
+        "versions": [
+            {
+                "version": "3.0.0.0",
+                "changelog": "Media Bar 3.0.0.0 for Jellyfin 12. Built from slmingol/jellyfin-plugin-media-bar@v12, tracking IAmParadox27 upstream.",
+                "targetAbi": "12.0.0.0",
+                "sourceUrl": "https://github.com/slmingol/jellyfin-plugin-media-bar/releases/download/3.0.0.0-jf12/Release-12.0.0.zip",
+                "checksum": "AECFBDE7EB06DCE6123C7A972D504FA3",
+                "timestamp": "2026-09-15T00:00:00"
+            }
+        ]
+    }
+]
